@@ -1,0 +1,13 @@
+#!/bin/bash
+print_usage() {
+  echo "Usage: $0 ip_addr device"
+}
+if [ $# -ne 2 ]; then
+  echo "Error: Too few arguments" >&2
+  print_usage
+  exit 1
+fi
+iperf -c $1 -i 1 -t 60 | tee tcp_$2.txt
+# час (с) і швидкість (Мбіт/с) для графіка
+sed -nE 's#.*[[:space:]]([0-9.]+)-[[:space:]]*([0-9.]+) sec.*[[:space:]]([0-9.]+) ([KMG]?)bits/sec.*#\1 \2 \3 \4#p' tcp_$2.txt \
+ | awk '{ if ($2-$1 > 1.5) next; v=$3; if ($4=="G") v*=1000; else if ($4=="K") v/=1000; else if ($4=="") v/=1e6; print $2, v }' > tcp_$2.dat

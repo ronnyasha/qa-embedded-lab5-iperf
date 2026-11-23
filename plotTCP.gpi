@@ -1,0 +1,15 @@
+#!/usr/bin/gnuplot -persist
+set title "MTBF test: TCP throughput"
+set xlabel "Time, sec"
+set ylabel "Mbit/sec"
+set grid
+set yrange [0:*]
+files = system("ls -1 tcp_*.dat")
+phone(f) = substr(f, 5, strlen(f) - 4)
+set terminal pngcairo size 1000,500
+set output "tcp_plot.png"
+plot for [file in files] file using 1:2 title phone(file) with lines lw 2
+set output
+set terminal qt
+replot
+pause mouse close
